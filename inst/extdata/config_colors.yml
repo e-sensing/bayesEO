@@ -1,0 +1,181 @@
+# Default Palette includes:
+# Most classes of the "Brazilian Vegetation Manual" (IBGE,2001)
+# IPCC AFOLU, TerraClass project, IGBP Discover, Copernicus Global Land Cover
+
+# Source https://htmlcolorcodes.com/color-chart/flat-design-color-chart/
+
+colors:
+    Tropical_Forest:
+        # Based on "nephritis" palette of Flat Design Color Chart
+        Evergreen_Broadleaf_Forest  : &forest "#1E8449"
+        # Forest
+        Forest                      : *forest
+        Closed_Forest               : *forest
+        # Dense Woodlands and similar
+        Woodland                    : &woodlands "#27AE60"
+        Dense_Woodland              : *woodlands
+        Woody_Savanna               : *woodlands
+        Open_Forest                 : *woodlands
+        Cerradao                    : *woodlands
+        # Mixed Forest
+        Mixed_Forest                : *woodlands
+        Sparse_Forest               : *woodlands
+
+    Savanna:
+        # Savanna and Cerrado
+        # Based on "emerald" palette of Flat Design Color Chart
+        Savanna                     : &savanna "#58D68D"
+        Wooded_Grassland            : *savanna
+        Cerrado_Strictu_Sensu       : *savanna
+        Cerrado                     : *savanna
+        Campo_Cerrado               : &campo_cerrado "#ABEBC6"
+        Savanna_Parkland            : *campo_cerrado
+        Open_Cerrado                : *campo_cerrado
+
+    Deciduous_Tropical_Forests:
+        # Caatinga and decidous tropical forest
+        # Based on "green sea" palette of Flat Design Color Chart
+        Caatinga                    : &caatinga "#A2D9CE"
+        Deciduous_Forest            : *caatinga
+
+    Planted_Forest:
+        # Silviculture and Planted Forest
+        # Based on "green sea" palette of Flat Design Color Chart
+        Planted_Forest              : &planted_forest "#45B39D"
+        Silviculture                : *planted_forest
+        # Secondary Vegetation
+        # Based on "turqouise" palette from Flat Design Color Chart
+        Secondary_Vegetation        : "#48C9B0"
+
+    Boreal_Temperate_Forests:
+        # Based on "turquoise" palette of Flat Design Color Chart
+        Evergreen_Needleleaf_Forest  : &enf "#1ABC9C"
+        Deciduous_Needleleaf_Forest  : &dnf "#76D7C4"
+        Deciduous_Broadleaf_Forest   : &dnf "#A3E4D7"
+
+    Grassland:
+        # Based on "sunflower" palette of Flat Design Color Chart
+        Grassland                   : &grassland "#F7DC6F"
+        Steppe                      : *grassland
+        Natural_Herbaceous          : *grassland
+        # Pasture is a special case
+        # based on "green sea" palette of Flat Design Color Chart
+        Pasture                     : &pasture "#FCF3CF"
+        Dense_Herbaceous            : *pasture
+        Herbaceous_Vegetation       : *pasture
+
+    Shrubland:
+        # Based on "orange" palette of Flat Design Color Chart
+        Closed_Shrubland            : &closed_shrubland "#F39C12"
+        Wooded_Shrubland            : *closed_shrubland
+        Dense_Shrubland             : *closed_shrubland
+        Shrubland                   : &shrubland "#F8C471"
+        Open_Shrubland              : *shrubland
+        Sparse_Shrubland            : *shrubland
+        Rocky_Savanna               : *shrubland
+
+    Barren:
+        # Based on "orange" palette of Flat Design Color Chart
+        Barren                      : &barren "#FDEBD0"
+        Sparsely_Vegetated          : *barren
+        Natural_Non_Forested        : *barren
+        Nat_NonVeg                  : *barren
+        Natural_Non_Vegetated       : *barren
+        Dunes                       : "#FEF9E7"
+
+    Cropland:
+        # Based on "carrot" palette from Flat Design Color Chart
+        Cropland                    : &cropland "#F0B27A"
+        Temporary_Crop              : *cropland
+        Temporary_Agriculture       : *cropland
+        Agriculture_1_cycle         : *cropland
+        Cropland_1_cycle            : *cropland
+        Agriculture_2_cycle         : &ag_2_cycle "#EB984E"
+        Cropland_2_cycle            : *ag_2_cycle
+        Semi_Perennial_Crop         : &semi_perennial_crop "#E67E22"
+        # Sugarcane is semi perennial crop
+        Sugarcane                   : *semi_perennial_crop
+        Perennial_Crop              : &perennial_crop "#CA6F1E"
+        Perennial_Agriculture.      : *perennial_crop
+        Annual_Crop                 : *perennial_crop
+        # Coffee is perennial agriculture
+        Coffee                      : *perennial_crop
+
+        # Soybean and its variations
+        # Based on "orange" palette from Flat Design Color Chart
+        Soybeans                    : &soy "#FAD7A0"
+        Soy_Fallow                  : *soy
+        Soy                         : *soy
+        Soy_Sunflower               : "#F8C471"
+        Soy_Millet                  : &soy_millet "#F5B041"
+        Soy_Sorghum                 : *soy_millet
+        Soy_Corn                    : "#D68910"
+        Soy_Cotton                  : "#9C640C"
+
+        # Other crops
+        # Based on "pumpkin" palette from Flat Design Color Chart
+        # Cotton
+        Cotton                      : &cotton "#D35400"
+        Fallow_Cotton               : *cotton
+        Millet_Cotton               : *cotton
+        # Grains
+        Corn                        : &corn  "#DC7633"
+        Maize                       : *corn
+        Sorghum                     : &sorghum "#E59866"
+        Millet                      : *sorghum
+        Beans                       : "#EDBB99"
+        Wheat                       : "#F6DDCC"
+        # Based on "turquoise" palette of Flat Design Color Chart
+        Rice                        : "#FBEEE6"
+
+    Mosaic:
+        # Mosaic classes use color 2 of "YlGn-9" Brewer palette
+        Forest_Cropland_Mosaic     : "#F7FCB9"
+        Cropland_Natural_Vegetation: "#F7FCB9"
+
+    Wetland:
+        # Based on "belize hole" palette from Flat Design Color Chart
+        Water                       : "#2980B9"
+        Wetland                     :  &wetlands "#7FB3D5"
+        Permanent_Wetland           :  *wetlands
+        # Based on "peter river" palette from Flat Design Color Chart
+        Mangrove                    : "#D4E6F1"
+
+    Deforestation:
+
+        # Deforestation, Degradation, Mining
+        # Based on "Alizarin" palette from Flat Design Color Chart
+        Deforestation               : &deforestation "#FDEDEC"
+        Deforestation_Mask          : *deforestation
+        Degradation                 : "#F5B7B1"
+        # PRODES
+        # Based on "Alizarin" palette from Flat Design Color Chart
+        Burned_Area                 : &burned_area "#EC7063"
+        ClearCut_Burn               : *burned_area
+        # Based on "sunflower" palette of Flat Design Color Chart
+        Cleared_Area                : &clear_cut_soil "#F1C40F"
+        ClearCut_Soil               : *clear_cut_soil
+        Bare_Soil                   : *clear_cut_soil
+        # Based on "nephritis" palette of Flat Design Color Chart
+        Highly_Degraded             : &clear_cut_deg "#D4EFDF"
+        ClearCut_Veg                : *clear_cut_deg
+        # Based on "amethyst" palette from Flat Design Color Chart
+        Mining                      : "#C39BD3"
+        # Based on "silver" palette from Flat Design Color Chart
+        Non_Forest                  : "#BDC3C7"
+    Urban:
+        # Based on "wet asphalt" palette from Flat Design Color Chart
+        Urban_Area                  : "#85929E"
+
+    Snow_Ice:
+        # Based on "asbestos" palette from Flat Design Color Chart
+        Snow_Ice                    : &snow "#E5E8E8"
+
+    Others:
+        # No Class uses "silver" palette from Flat Design Color Chart
+        No_Class                    : &no_class "#F2F3F4"
+        No_Samples                  : *no_class
+        Unclassified                : *no_class
+        # Cloud uses "cloud" palette from Flat Design Color Chart
+        Cloud                       : &cloud "#D0D3D4"
+

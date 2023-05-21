@@ -1,0 +1,53 @@
+Package: bayesEO
+Type: Package
+Version: 0.1.0
+Title: Bayesian Smoothing of Remote Sensing Image Classification
+Authors@R: c(person('Gilberto', 'Camara', role = c('aut', 'cre'), email = 'gilberto.camara.inpe@gmail.com'),
+             person('Renato', 'Assuncao', role = c('aut'), email = 'assuncaoest@gmail.com'),
+             person('Rolf', 'Simoes', role = c('aut'), email = 'rolf.simoes@inpe.br'),
+             person('Felipe', 'Souza', role = c('aut'), email = 'felipe.carvalho@inpe.br')
+             )
+Maintainer: Gilberto Camara <gilberto.camara.inpe@gmail.com>
+Description: A  Bayesian smoothing method for post-processing of remote 
+    sensing image classification which refines the
+    labelling in a classified image in order to enhance its classification accuracy.
+    Combines pixel-based classification methods with a spatial post-processing
+    method to remove outliers and misclassified pixels.
+Encoding: UTF-8
+Language: en-US
+Depends: R (>= 4.0.0)
+URL: https://github.com/e-sensing/bayesEO/
+BugReports: https://github.com/e-sensing/bayesEO/issues
+License: GPL-3 + file LICENSE
+ByteCompile: true
+LazyData: true
+Imports:
+    dplyr,
+    ggplot2,
+    grDevices,
+    purrr,
+    Rcpp,
+    stars,
+    stats,
+    terra,
+    tibble,
+    tidyr,
+    tmap,
+    yaml
+Suggests:
+    RcppArmadillo,
+    testthat
+LinkingTo:
+    Rcpp,
+    RcppArmadillo
+RoxygenNote: 7.2.3
+Collate: 
+    'api_check.R'
+    'bayes_colors.R'
+    'bayes_label.R'
+    'bayes_plot.R'
+    'bayes_smooth.R'
+    'bayes_variance.R'
+    'bayes_utils.R'
+    'RcppExports.R'
+    'zzz.R'
