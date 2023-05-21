@@ -83,7 +83,8 @@ bayes_plot <- function(x,
     # select stars bands to be plotted
     bds <- as.numeric(names(all_labels[all_labels %in% labels]))
 
-    p <- tmap::tm_shape(probs_st[, , , bds]) +
+    p <- suppressMessages(
+        tmap::tm_shape(probs_st[, , , bds]) +
         tmap::tm_raster(style = "cont",
                         palette = palette,
                         midpoint = 0.5,
@@ -97,6 +98,7 @@ bayes_plot <- function(x,
                         legend.title.size = tmap_legend_title_size,
                         legend.text.size  =  tmap_legend_text_size,
                         outer.margins = 0)
+    )
 
     return(p)
 }
