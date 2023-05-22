@@ -9,8 +9,8 @@ bayes_map(
   legend = NULL,
   palette = "Spectral",
   tmap_graticules_labels_size = 0.7,
-  tmap_legend_title_size = 1,
-  tmap_legend_text_size = 1,
+  tmap_legend_title_size = 0.7,
+  tmap_legend_text_size = 0.7,
   tmap_legend_bg_color = "white",
   tmap_legend_bg_alpha = 0.5,
   tmap_max_cells = 1e+06
