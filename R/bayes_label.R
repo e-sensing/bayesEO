@@ -89,11 +89,14 @@ bayes_summary <- function(x, scale = 1, sample_size = 15000){
         "SpatRaster" %in% class(x),
         msg = "input is not SpatRaster type"
     )
+    signif_ignore_integer <- function(x, digits = 2) {
+        as.integer(x) + signif(x - as.integer(x), digits)
+    }
     if (all(terra::is.factor(x))) {
         freq <- terra::freq(x)
         area_pixel <- terra::xres(x)*terra::yres(x)
         area_km2 <- freq$count*area_pixel/1e+06
-        area_km2 <- round(area_km2, 2)
+        area_km2 <- signif_ignore_integer(area_km2)
         sum <- tibble::tibble(
             class = terra::levels(x)[[1]]$class,
             area  = area_km2

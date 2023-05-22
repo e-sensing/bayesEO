@@ -18,7 +18,7 @@ Language: en-US
 Depends: R (>= 4.0.0)
 URL: https://github.com/e-sensing/bayesEO/
 BugReports: https://github.com/e-sensing/bayesEO/issues
-License: GPL-3 + file LICENSE
+License: GPL-3
 ByteCompile: true
 LazyData: true
 Imports:
