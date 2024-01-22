@@ -18,15 +18,15 @@
 #'     # get the probability file
 #'     data_dir <- system.file("/extdata/probs/", package = "bayesEO")
 #'     file <- list.files(data_dir)
-#'     # read the probability file into a SpatRaster
-#'     x <- terra::rast(paste0(data_dir, "/", file))
+#'     # build the full path
+#'     probs_file <- paste0(data_dir, "/", file)
 #'     # include the labels
 #'     labels <- c("Water", "ClearCut_Burn", "ClearCut_Soil",
 #'              "ClearCut_Veg", "Forest", "Wetland")
 #'     # associate the labels to the names of the SpatRaster
-#'     names(x) <- labels
+#'     probs <- bayes_read(probs_file, labels)
 #'     # Plot the probability image
-#'     bayes_plot(x, scale = 0.0001, labels = c("Forest", "ClearCut_Soil"))
+#'     bayes_plot(probs, scale = 0.0001, labels = c("Forest", "ClearCut_Soil"))
 #' }
 #'
 #' @export
@@ -121,16 +121,17 @@ bayes_plot <- function(x,
 #'
 #' @examples
 #' if (bayes_run_examples()) {
-#'     # get the probability file
-#'     data_dir <- system.file("/extdata/probs/", package = "bayesEO")
+#'     # Define location of a probability file
+#'     data_dir <- system.file("/extdata/Rondonia-20LLQ/probs", package = "bayesEO")
+#'     # list the file
 #'     file <- list.files(data_dir)
-#'     # read the probability file into a SpatRaster
-#'     x <- terra::rast(paste0(data_dir, "/", file))
-#'     # include the labels
+#'     # build the full path
+#'     probs_file <- paste0(data_dir, "/", file)
+#'     # define labels
 #'     labels <- c("Water", "ClearCut_Burn", "ClearCut_Soil",
 #'              "ClearCut_Veg", "Forest", "Wetland")
-#'     # associate the labels to the names of the SpatRaster
-#'     names(x) <- labels
+#'
+#'     probs_image <- bayes_read(probs_file, labels)
 #'     # Label the probs image
 #'     y <- bayes_label(x)
 #'     # produce a map of the labelled image

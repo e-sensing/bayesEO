@@ -1,6 +1,6 @@
 Package: bayesEO
 Type: Package
-Version: 0.1.0
+Version: 0.2.0
 Title: Bayesian Smoothing of Remote Sensing Image Classification
 Authors@R: c(person('Gilberto', 'Camara', role = c('aut', 'cre'), email = 'gilberto.camara.inpe@gmail.com'),
              person('Renato', 'Assuncao', role = c('aut'), email = 'assuncaoest@gmail.com'),
@@ -46,6 +46,7 @@ Collate:
     'bayes_colors.R'
     'bayes_label.R'
     'bayes_plot.R'
+    'bayes_read.R'
     'bayes_smooth.R'
     'bayes_variance.R'
     'bayes_utils.R'

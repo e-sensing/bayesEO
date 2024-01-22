@@ -13,3 +13,11 @@ C_label_max_prob <- function(x) {
     .Call(`_bayesEO_C_label_max_prob`, x)
 }
 
+kernel_smoother <- function(m, m_nrow, m_ncol, w, normalised) {
+    .Call(`_bayesEO_kernel_smoother`, m, m_nrow, m_ncol, w, normalised)
+}
+
+bilateral_smoother <- function(m, m_nrow, m_ncol, w, tau) {
+    .Call(`_bayesEO_bilateral_smoother`, m, m_nrow, m_ncol, w, tau)
+}
+
