@@ -1,14 +1,22 @@
 #' @title  Read probability maps
 #' @name   bayes_read_image
 #' @author Gilberto Camara, \email{gilberto.camara@@inpe.br}
-#' @param  file    Full path to raster multi-band file
-#'                       containing probability matrices
-#' @param  labels        Labels to be assigned to the bands
+#' @param  files    Full path to raster files
 #' @return A SpatRaster object
+#' @examples
+#' if (bayes_run_examples()) {
+#' # Define location of a probability file
+#' data_dir <- system.file("/extdata/rgb", package = "bayesEO")
+#' # list the file
+#' files <- list.files(data_dir)
+#' # build the full path
+#' image_files <- paste0(data_dir, "/", files)
+#' rgb_image <- bayes_read_image(image_files)
+#' }
 #' @export
-bayes_read_image <- function(red_file, green_file, blue_file){
+bayes_read_image <- function(files){
     # read the probability file into a SpatRaster
-    x <- terra::rast(c(red_file, green_file, blue_file))
+    x <- terra::rast(files)
     # associate the labels to the names of the SpatRaster
     return(x)
 }
@@ -20,9 +28,9 @@ bayes_read_image <- function(red_file, green_file, blue_file){
 #' @param  labels        Labels to be assigned to the bands
 #' @return A SpatRaster object
 #' @examples
-#' {
+#' if (bayes_run_examples()) {
 #' # Define location of a probability file
-#' data_dir <- system.file("/extdata/Rondonia-20LLQ/probs", package = "bayesEO")
+#' data_dir <- system.file("/extdata/probs", package = "bayesEO")
 #' # list the file
 #' file <- list.files(data_dir)
 #' # build the full path

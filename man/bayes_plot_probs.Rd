@@ -6,11 +6,10 @@
 \usage{
 bayes_plot_probs(
   x,
-  scale = 1,
+  scale = 1e-04,
   labels = NULL,
-  quantile = NULL,
   palette = "YlGnBu",
-  tmap_scale = 1
+  tmap_scale = 1.5
 )
 }
 \arguments{
@@ -20,17 +19,9 @@ bayes_plot_probs(
 
 \item{labels}{Labels to be plotted}
 
-\item{quantile}{Thereshold of values to be plotted}
-
 \item{palette}{An RColorBrewer palette}
 
-\item{tmap_legend_title_size}{Size of legend title (default: 1.5)}
-
-\item{tmap_legend_text_size}{Size of legend text (default: 1.2)}
-
-\item{tmap_legend_bg_color}{Color of legend backgound (default: "white")}
-
-\item{tmap_legend_bg_alpha}{Transparency of legend background (default: 0.5)}
+\item{tmap_scale}{Global scale parameter for map (default: 1.5)}
 }
 \value{
 A plot object
@@ -51,7 +42,9 @@ if (bayes_run_examples()) {
     # associate the labels to the names of the SpatRaster
     probs <- bayes_read_probs(probs_file, labels)
     # Plot the probability image
-    bayes_plot_probs(probs, scale = 0.0001, labels = c("Forest", "ClearCut_Soil"))
+    bayes_plot_probs(probs,
+                     scale = 0.0001,
+                     tmap_scale = 1.5)
 }
 
 }

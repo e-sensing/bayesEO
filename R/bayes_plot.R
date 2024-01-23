@@ -10,7 +10,17 @@
 #' @param  blue          Band for blue color.
 #'
 #' @return               A plot object with an RGB image
-#
+#' @examples
+#' if (bayes_run_examples()) {
+#' # Define location of a probability file
+#' data_dir <- system.file("/extdata/rgb", package = "bayesEO")
+#' # list the file
+#' files <- list.files(data_dir)
+#' # build the full path
+#' image_files <- paste0(data_dir, "/", files)
+#' rgb_image <- bayes_read_image(image_files)
+#' bayes_plot_rgb(rgb_image, red = "B11", green = "B8A", blue = "B03")
+#' }
 #' @export
 bayes_plot_rgb <- function(image,
                            red,
@@ -18,16 +28,13 @@ bayes_plot_rgb <- function(image,
                            blue) {
 
     # get RGB files for the requested timeline
-    red_file <- .tile_path(tile, red, date)
-    green_file <- .tile_path(tile, green, date)
-    blue_file <- .tile_path(tile, blue, date)
+    red_file   <- terra::sources(image[[red]])
+    green_file <- terra::sources(image[[green]])
+    blue_file  <- terra::sources(image[[blue]])
     rgb_files <- c(r = red_file, g = green_file, b = blue_file)
 
     # size of data to be read
-    size <- .plot_read_size(
-        image = image,
-        tmap_options = tmap_options
-    )
+    size <- .plot_read_size(image = image)
 
     # read raster data as a stars object with separate RGB bands
     rgb_st <- stars::read_stars(
@@ -46,9 +53,6 @@ bayes_plot_rgb <- function(image,
                             probs = c(0.05, 0.95),
                             stretch = TRUE
     )
-    scale <- 0.0001
-    offset <- 0
-    stars_obj <- stars_obj * scale + offset
 
     p <- tmap::tm_shape(rgb_st) +
         tmap::tm_raster() +
@@ -90,7 +94,7 @@ bayes_plot_rgb <- function(image,
 #'
 #' @export
 bayes_plot_probs <- function(x,
-                       scale = 1,
+                       scale = 0.0001,
                        labels = NULL,
                        palette = "YlGnBu",
                        tmap_scale = 1.5){
@@ -327,11 +331,10 @@ bayes_plot_hist <- function(x,
 #' @author Gilberto Camara, \email{gilberto.camara@@inpe.br}
 #'
 #' @param  image         Image to be plotted.
-#' @param  tmap_options  Named vector with options
 #' @return               Cell size for x and y coordinates.
 #'
 #'
-.plot_read_size <- function(image, tmap_options) {
+.plot_read_size <- function(image) {
     # get the maximum number of bytes to be displayed
     max_cells <- 1e+07
     # numbers of nrows and ncols

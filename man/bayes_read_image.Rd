@@ -4,19 +4,27 @@
 \alias{bayes_read_image}
 \title{Read probability maps}
 \usage{
-bayes_read_image(red_file, green_file, blue_file)
+bayes_read_image(files)
 }
 \arguments{
-\item{file}{Full path to raster multi-band file
-containing probability matrices}
-
-\item{labels}{Labels to be assigned to the bands}
+\item{files}{Full path to raster files}
 }
 \value{
 A SpatRaster object
 }
 \description{
 Read probability maps
+}
+\examples{
+if (bayes_run_examples()) {
+# Define location of a probability file
+data_dir <- system.file("/extdata/rgb", package = "bayesEO")
+# list the file
+files <- list.files(data_dir)
+# build the full path
+image_files <- paste0(data_dir, "/", files)
+rgb_image <- bayes_read_image(image_files)
+}
 }
 \author{
 Gilberto Camara, \email{gilberto.camara@inpe.br}

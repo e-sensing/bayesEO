@@ -19,9 +19,9 @@ A SpatRaster object
 Read probability maps
 }
 \examples{
-{
+if (bayes_run_examples()) {
 # Define location of a probability file
-data_dir <- system.file("/extdata/Rondonia-20LLQ/probs", package = "bayesEO")
+data_dir <- system.file("/extdata/probs", package = "bayesEO")
 # list the file
 file <- list.files(data_dir)
 # build the full path
