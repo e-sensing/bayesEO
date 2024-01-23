@@ -23,6 +23,8 @@ ByteCompile: true
 LazyData: true
 Imports:
     dplyr,
+    leaflet,
+    leafem,
     ggplot2,
     grDevices,
     purrr,
@@ -48,7 +50,8 @@ Collate:
     'bayes_plot.R'
     'bayes_read.R'
     'bayes_smooth.R'
-    'bayes_variance.R'
     'bayes_utils.R'
+    'bayes_variance.R'
+    'bayes_view.R'
     'RcppExports.R'
     'zzz.R'

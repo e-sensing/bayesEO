@@ -1,5 +1,5 @@
 #' @title  Include leaflet to view images (BW or RGB)
-#' @name bayes_view_image_raster
+#' @name bayes_view
 #' @keywords internal
 #' @noRd
 #' @author Gilberto Camara, \email{gilberto.camara@@inpe.br}
@@ -12,25 +12,21 @@
 #' @param  legend        Named vector that associates labels to colors.
 #' @param  palette       Palette provided in the configuration file.
 #' @param  opacity       Opacity of overlayed map
-#' @param  view_max_mb   Maximum size of leaflet to be visualized
-#'
 #' @return               A leaflet object.
 #'
-.view_image_raster <- function(image,
-                               map,
-                               red,
-                               green,
-                               blue,
-                               legend,
-                               palette,
-                               opacity,
-                               view_max_mb) {
+bayes_view <- function(image,
+                       map,
+                       red,
+                       green,
+                       blue,
+                       legend = NULL,
+                       palette = "Spectral",
+                       opacity = 0.5) {
     # set the view_max_mb parameter
     view_max_mb <- 64
     # find out if resampling is required (for big images)
     output_size <- .view_resample_size(
         image = image,
-        ndates = length(dates),
         view_max_mb = 64
     )
     # create a leaflet and add providers
@@ -41,7 +37,7 @@
     # create a leaflet for RGB bands
     leaf_map <- leaf_map |>
         .view_rgb_bands(
-            cube = cube,
+            image = image,
             red = red,
             green = green,
             blue = blue,
@@ -52,18 +48,13 @@
     leaf_map <- leaf_map |>
         .view_map(
             map = map,
-            tiles = tiles,
             legend = legend,
             palette = palette,
             opacity = opacity,
             output_size = output_size
         )
     # get overlay groups
-    overlay_groups <- .view_add_overlay_grps(
-        cube = cube,
-        dates = dates,
-        class_cube = class_cube
-    )
+    overlay_groups <- c("RGB image", "map")
     # add layers control to leafmap
     leaf_map <- leaf_map |>
         leaflet::addLayersControl(
@@ -73,7 +64,7 @@
         ) |>
         # add legend to leaf_map
         .view_add_legend(
-            cube = class_cube,
+            map = map,
             legend = legend,
             palette = palette
         )
@@ -231,56 +222,42 @@
 #' @param  opacity       Fill opacity
 #' @param  output_size   Controls size of leaflet to be visualized
 #'
-.view_class_cube <- function(leaf_map,
-                             map,
-                             legend,
-                             palette,
-                             opacity,
-                             output_size) {
+.view_map <- function(leaf_map,
+                      map,
+                      legend,
+                      palette,
+                      opacity,
+                      output_size) {
     # should we overlay a classified image?
     # get the labels
     labels <- names(map)
     # obtain the colors
-    colors <- .colors_get(
+    colors <- .color_get_labels(
         labels = labels,
         legend = legend,
         palette = palette,
         rev = TRUE
     )
-    # select the tiles that will be shown
-    if (!purrr::is_null(tiles)) {
-        class_cube <- dplyr::filter(
-            class_cube,
-            .data[["tile"]] %in% tiles
-        )
-    }
 
     # create the stars objects that correspond to the tiles
-    st_objs <- slider::slide(class_cube, function(tile) {
-        # obtain the raster stars object
-        st_obj <- stars::read_stars(
-            .tile_path(tile),
-            RAT = labels,
-            RasterIO = list(
-                "nBufXSize" = output_size[["xsize"]],
-                "nBufYSize" = output_size[["ysize"]]
-            ),
-            proxy = FALSE
-        )
-        return(st_obj)
-    })
-    # keep the first object
-    st_merge <- st_objs[[1]]
-    # if there is more than one stars object, merge them
-    if (length(st_objs) > 1) {
-        st_merge <- stars::st_mosaic(
-            st_objs[[1]],
-            st_objs[[2:length(st_objs)]]
-        )
-    }
+    # read the file using stars
+    st_obj <- stars::st_as_stars(map)
+    # rename stars object
+    st_obj <- stats::setNames(st_obj, "labels")
+        # # obtain the raster stars object
+        # st_obj <- stars::read_stars(
+        #     .tile_path(tile),
+        #     RAT = labels,
+        #     RasterIO = list(
+        #         "nBufXSize" = output_size[["xsize"]],
+        #         "nBufYSize" = output_size[["ysize"]]
+        #     ),
+        #     proxy = FALSE
+        # )
+        # return(st_obj)
     # resample and warp the image
     st_obj_new <- stars::st_warp(
-        src = st_merge,
+        src = st_obj,
         crs = sf::st_crs("EPSG:3857")
     )
     # add the classified image object
@@ -296,42 +273,46 @@
         )
     return(leaf_map)
 }
-.view_add_stars_image <- function(leaf_map,
-                                  band_file,
-                                  tile,
-                                  band,
-                                  date,
-                                  palette,
-                                  output_size) {
-    # create a stars object
-    st_obj <- stars::read_stars(
-        band_file,
-        along = "band",
-        RasterIO = list(
-            "nBufXSize" = output_size[["xsize"]],
-            "nBufYSize" = output_size[["ysize"]]
-        ),
-        proxy = FALSE
+#' @title  Add a legend to the leafmap
+#' @name .view_add_legend
+#' @keywords internal
+#' @noRd
+#' @author Gilberto Camara, \email{gilberto.camara@@inpe.br}
+#'
+#' @param  leaf_map      Leaflet map
+#' @param  map           Classified map
+#' @param  legend        Class legend
+#' @param  palette       Color palette
+#' @return               Leaflet map with legend
+#'
+#'
+.view_add_legend <- function(leaf_map,
+                             map,
+                             legend,
+                             palette) {
+    # initialize labels
+    labels <- names(map)
+
+    # obtain labels
+    labels <- sort(unname(labels))
+    colors <- .color_get_labels(
+        labels = labels,
+        legend = legend,
+        palette = palette,
+        rev = TRUE
     )
-    # warp the image
-    st_obj_new <- stars::st_warp(
-        src = st_obj,
-        crs = sf::st_crs("EPSG:3857")
+    # create a palette of colors
+    fact_pal <- leaflet::colorFactor(
+        palette = colors,
+        domain = labels
     )
-    if (!purrr::is_null(date)) {
-        group <- paste(tile[["tile"]], date)
-    } else {
-        group <- paste(tile[["tile"]], band)
-    }
-    # add stars to leaflet
-    leaf_map <- leafem::addStarsImage(
-        leaf_map,
-        x = st_obj_new,
-        band = 1,
-        colors = palette,
-        project = FALSE,
-        group = group,
-        maxBytes = output_size["leaflet_maxbytes"]
+    leaf_map <- leaflet::addLegend(
+        map = leaf_map,
+        position = "topright",
+        pal = fact_pal,
+        values = labels,
+        title = "Classes",
+        opacity = 1
     )
     return(leaf_map)
 }

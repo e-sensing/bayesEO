@@ -5,7 +5,7 @@
         sprintf(
             "Loaded bayesEO v%s.
              See ?bayesEO for help, citation(\"bayesEO\") for use in publication.",
-             utils::packageDescription("sits")$Version
+             utils::packageDescription("bayesEO")$Version
         )
     )
 }

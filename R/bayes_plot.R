@@ -1,15 +1,72 @@
+#' @title  Plot RGB data cubes
+#' @name bayes_plot_rgb
+#' @author Gilberto Camara, \email{gilberto.camara@@inpe.br}
+#'
+#' @description Plot RGB raster cube
+#'
+#' @param  image         Object of class SpatRaster.
+#' @param  red           Band for red color.
+#' @param  green         Band for green color.
+#' @param  blue          Band for blue color.
+#'
+#' @return               A plot object with an RGB image
+#
+#' @export
+bayes_plot_rgb <- function(image,
+                           red,
+                           green,
+                           blue) {
+
+    # get RGB files for the requested timeline
+    red_file <- .tile_path(tile, red, date)
+    green_file <- .tile_path(tile, green, date)
+    blue_file <- .tile_path(tile, blue, date)
+    rgb_files <- c(r = red_file, g = green_file, b = blue_file)
+
+    # size of data to be read
+    size <- .plot_read_size(
+        image = image,
+        tmap_options = tmap_options
+    )
+
+    # read raster data as a stars object with separate RGB bands
+    rgb_st <- stars::read_stars(
+        c(red_file, green_file, blue_file),
+        along = "band",
+        RasterIO = list(
+            "nBufXSize" = size[["xsize"]],
+            "nBufYSize" = size[["ysize"]]
+        ),
+        proxy = FALSE
+    )
+    rgb_st <- stars::st_rgb(rgb_st[, , , 1:3],
+                            dimension = "band",
+                            maxColorValue = 10000,
+                            use_alpha = FALSE,
+                            probs = c(0.05, 0.95),
+                            stretch = TRUE
+    )
+    scale <- 0.0001
+    offset <- 0
+    stars_obj <- stars_obj * scale + offset
+
+    p <- tmap::tm_shape(rgb_st) +
+        tmap::tm_raster() +
+        tmap::tm_graticules(
+            labels.size = 0.7
+        ) +
+        tmap::tm_compass()
+    return(p)
+}
+
 #' @title  Plot probability and variance maps
-#' @name   bayes_plot
+#' @name   bayes_plot_probs
 #' @author Gilberto Camara, \email{gilberto.camara@@inpe.br}
 #' @param  x             SpatRaster to be plotted.
 #' @param  scale         Scaling factor to apply to the data
 #' @param  labels        Labels to be plotted
-#' @param  quantile      Thereshold of values to be plotted
 #' @param  palette       An RColorBrewer palette
-#' @param  tmap_legend_title_size  Size of legend title (default: 1.5)
-#' @param  tmap_legend_text_size   Size of legend text (default: 1.2)
-#' @param  tmap_legend_bg_color    Color of legend backgound (default: "white")
-#' @param  tmap_legend_bg_alpha    Transparency of legend background (default: 0.5)
+#' @param  tmap_scale    Global scale parameter for map (default: 1.5)
 #'
 #' @return               A plot object
 #'
@@ -24,21 +81,19 @@
 #'     labels <- c("Water", "ClearCut_Burn", "ClearCut_Soil",
 #'              "ClearCut_Veg", "Forest", "Wetland")
 #'     # associate the labels to the names of the SpatRaster
-#'     probs <- bayes_read(probs_file, labels)
+#'     probs <- bayes_read_probs(probs_file, labels)
 #'     # Plot the probability image
-#'     bayes_plot(probs, scale = 0.0001, labels = c("Forest", "ClearCut_Soil"))
+#'     bayes_plot_probs(probs,
+#'                      scale = 0.0001,
+#'                      tmap_scale = 1.5)
 #' }
 #'
 #' @export
-bayes_plot <- function(x,
+bayes_plot_probs <- function(x,
                        scale = 1,
                        labels = NULL,
-                       quantile = NULL,
                        palette = "YlGnBu",
-                       tmap_legend_title_size = 1.0,
-                       tmap_legend_text_size = 1.0,
-                       tmap_legend_bg_color = "white",
-                       tmap_legend_bg_alpha = 0.5) {
+                       tmap_scale = 1.5){
 
     # check input image
     .check_that(
@@ -56,21 +111,6 @@ bayes_plot <- function(x,
         .check_that(all(labels  %in% all_labels),
                     msg = "labels not in image")
 
-    if (!purrr::is_null(quantile)) {
-        # get values
-        values <- terra::values(x)
-        # show only the chosen quantile
-        values <- lapply(
-            colnames(values), function(name) {
-                vls <- values[,name]
-                quant <- stats::quantile(vls, quantile, na.rm = TRUE)
-                vls[vls < quant] <- NA
-                return(vls)
-            })
-        values <- do.call(cbind, values)
-        colnames(values) <- names(x)
-        terra::values(x) <- values
-    }
     # read the file using stars
     probs_st <- stars::st_as_stars(x)
     # scale the data
@@ -84,20 +124,28 @@ bayes_plot <- function(x,
     bds <- as.numeric(names(all_labels[all_labels %in% labels]))
 
     p <- suppressMessages(
-        tmap::tm_shape(probs_st[, , , bds]) +
+        tmap::tm_shape(probs_st[, , , bds],
+                       raster.downsample = FALSE) +
         tmap::tm_raster(style = "cont",
                         palette = palette,
                         midpoint = 0.5,
                         title = all_labels[all_labels %in% labels]) +
         tmap::tm_facets(free.coords = TRUE) +
         tmap::tm_compass() +
-        tmap::tm_layout(legend.show = TRUE,
-                        legend.outside = FALSE,
-                        legend.bg.color   = tmap_legend_bg_color,
-                        legend.bg.alpha   = tmap_legend_bg_alpha,
-                        legend.title.size = tmap_legend_title_size,
-                        legend.text.size  =  tmap_legend_text_size,
-                        outer.margins = 0)
+        # tmap::tm_layout(legend.show = TRUE,
+        #                 legend.outside = FALSE,
+        #                 legend.bg.color   = tmap_legend_bg_color,
+        #                 legend.bg.alpha   = tmap_legend_bg_alpha,
+        #                 legend.title.size = tmap_legend_title_size,
+        #                 legend.text.size  =  tmap_legend_text_size,
+        #                 outer.margins = 0)
+        tmap::tm_layout(
+            scale = tmap_scale,
+            legend.show = TRUE,
+            legend.outside = FALSE,
+            legend.bg.color = "white",
+            legend.bg.alpha = 0.5
+        )
     )
 
     return(p)
@@ -105,7 +153,7 @@ bayes_plot <- function(x,
 
 
 #' @title  Plot labelled map
-#' @name   bayes_map
+#' @name   bayes_plot_map
 #' @author Gilberto Camara \email{gilberto.camara@@inpe.br}
 #' @param  x                           SpatRaster to be plotted.
 #' @param  legend                      Named vector that associates labels to colors.
@@ -131,15 +179,15 @@ bayes_plot <- function(x,
 #'     labels <- c("Water", "ClearCut_Burn", "ClearCut_Soil",
 #'              "ClearCut_Veg", "Forest", "Wetland")
 #'
-#'     probs_image <- bayes_read(probs_file, labels)
+#'     probs_image <- bayes_read_probs(probs_file, labels)
 #'     # Label the probs image
 #'     y <- bayes_label(x)
 #'     # produce a map of the labelled image
-#'     bayes_map(y)
+#'     bayes_plot_map(y)
 #' }
 #'
 #' @export
-bayes_map <- function(x,
+bayes_plot_map <- function(x,
                       legend = NULL,
                       palette = "Spectral",
                       tmap_graticules_labels_size = 0.7,
@@ -172,9 +220,8 @@ bayes_map <- function(x,
     # plot using tmap
     # tmap requires numbers, not names    # rename stars object
     stars_obj <- stats::setNames(stars_obj, "labels")
-    names(colors) <- seq_along(names(colors))
-    p <- suppressWarnings(
-        tmap::tm_shape(stars_obj) +
+    p <- suppressMessages(tmap::tm_shape(stars_obj,
+                       raster.downsample = FALSE) +
             tmap::tm_raster(
                 style = "cat",
                 palette = colors,
@@ -195,7 +242,7 @@ bayes_map <- function(x,
 
 }
 #' @title  Plot histogram
-#' @name   bayes_hist
+#' @name   bayes_plot_hist
 #' @author Gilberto Camara, \email{gilberto.camara@@inpe.br}
 #' @param  x             SpatRaster to be plotted.
 #' @param  scale         Scale factor for SpatRaster
@@ -222,7 +269,7 @@ bayes_map <- function(x,
 #'}
 #'
 #' @export
-bayes_hist <- function(x,
+bayes_plot_hist <- function(x,
                        scale = 1,
                        quantile = NULL,
                        sample_size = 15000) {
@@ -271,4 +318,37 @@ bayes_hist <- function(x,
     p <- p + ggplot2::facet_wrap(facets = "labels")
 
     return(p)
+}
+
+#' @title  Return the cell size for the image to be reduced for plotting
+#' @name .plot_read_size
+#' @keywords internal
+#' @noRd
+#' @author Gilberto Camara, \email{gilberto.camara@@inpe.br}
+#'
+#' @param  image         Image to be plotted.
+#' @param  tmap_options  Named vector with options
+#' @return               Cell size for x and y coordinates.
+#'
+#'
+.plot_read_size <- function(image, tmap_options) {
+    # get the maximum number of bytes to be displayed
+    max_cells <- 1e+07
+    # numbers of nrows and ncols
+    nrows <- nrow(image)
+    ncols <- ncol(image)
+
+    # do we need to compress?
+    ratio <- max((nrows * ncols / max_cells), 1)
+    # only create local files if required
+    if (ratio > 1) {
+        new_nrows <- round(nrows / sqrt(ratio))
+        new_ncols <- round(ncols * (new_nrows / nrows))
+    } else {
+        new_nrows <- round(nrows)
+        new_ncols <- round(ncols)
+    }
+    return(c(
+        "xsize" = new_ncols, "ysize" = new_nrows
+    ))
 }
