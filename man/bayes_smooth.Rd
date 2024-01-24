@@ -36,14 +36,14 @@ if (bayes_run_examples()) {
     labels <- c("Water", "ClearCut_Burn", "ClearCut_Soil",
              "ClearCut_Veg", "Forest", "Wetland")
     # read the probs file
-    probs <- bayes_read(probs_file, labels)
+    probs <- bayes_read_probs(probs_file, labels)
     # smooth the probability image
     probs_smooth <- bayes_smooth(probs,
             window_size = 7,
             smoothness = 20
     )
     # plot the probability image
-    bayes_plot(probs_smooth, scale = 0.0001)
+    bayes_plot_probs(probs_smooth)
 }
 
 }

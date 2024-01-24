@@ -41,7 +41,7 @@ if (bayes_run_examples()) {
             sigma = 1
     )
     # plot the probability image
-    bayes_plot(gauss, scale = 0.0001)
+    bayes_plot_probs(gauss)
 }
 
 }

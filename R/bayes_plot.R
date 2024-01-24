@@ -8,7 +8,10 @@
 #' @param  red           Band for red color.
 #' @param  green         Band for green color.
 #' @param  blue          Band for blue color.
-#'
+#' @param  xmin          Subset to be shown (xmin)
+#' @param  xmax          Subset to be shown (xmax)
+#' @param  ymin          Subset to be shown (ymin)
+#' @param  ymax          Subset to be shown (ymax)
 #' @return               A plot object with an RGB image
 #' @examples
 #' if (bayes_run_examples()) {
@@ -25,7 +28,11 @@
 bayes_plot_rgb <- function(image,
                            red,
                            green,
-                           blue) {
+                           blue,
+                           xmin = NULL,
+                           xmax = NULL,
+                           ymin = NULL,
+                           ymax = NULL) {
 
     # get RGB files for the requested timeline
     red_file   <- terra::sources(image[[red]])
@@ -46,15 +53,30 @@ bayes_plot_rgb <- function(image,
         ),
         proxy = FALSE
     )
-    rgb_st <- stars::st_rgb(rgb_st[, , , 1:3],
+    if (!purrr::is_null(xmin) &&
+        !purrr::is_null(xmax) &&
+        !purrr::is_null(ymin) &&
+        !purrr::is_null(ymax)){
+
+        rgb_st <- stars::st_rgb(rgb_st[,xmin:xmax, ymin:ymax, 1:3],
                             dimension = "band",
                             maxColorValue = 10000,
                             use_alpha = FALSE,
                             probs = c(0.05, 0.95),
                             stretch = TRUE
-    )
+        )
+    } else {
+        rgb_st <- stars::st_rgb(rgb_st[,,, 1:3],
+                                dimension = "band",
+                                maxColorValue = 10000,
+                                use_alpha = FALSE,
+                                probs = c(0.05, 0.95),
+                                stretch = TRUE
+        )
+    }
 
-    p <- tmap::tm_shape(rgb_st) +
+    p <- tmap::tm_shape(rgb_st,
+                        raster.downsample = FALSE) +
         tmap::tm_raster() +
         tmap::tm_graticules(
             labels.size = 0.7
@@ -155,6 +177,10 @@ bayes_plot_probs <- function(x,
 #' @param  x                           SpatRaster to be plotted.
 #' @param  legend                      Named vector that associates labels to colors.
 #' @param  palette                     A sequential RColorBrewer palette
+#' @param  xmin                        Subset to be shown (xmin)
+#' @param  xmax                        Subset to be shown (xmax)
+#' @param  ymin                        Subset to be shown (ymin)
+#' @param  ymax                        Subset to be shown (ymax)
 #' @param  tmap_graticules_labels_size Size of graticules labels (default: 0.7)
 #' @param  tmap_legend_title_size      Size of legend title (default: 1.5)
 #' @param  tmap_legend_text_size       Size of legend text (default: 1.2)
@@ -187,9 +213,13 @@ bayes_plot_probs <- function(x,
 bayes_plot_map <- function(x,
                       legend = NULL,
                       palette = "Spectral",
+                      xmin = NULL,
+                      xmax = NULL,
+                      ymin = NULL,
+                      ymax = NULL,
                       tmap_graticules_labels_size = 0.7,
-                      tmap_legend_title_size = 0.7,
-                      tmap_legend_text_size = 0.7,
+                      tmap_legend_title_size = 0.85,
+                      tmap_legend_text_size = 0.85,
                       tmap_legend_bg_color = "white",
                       tmap_legend_bg_alpha = 0.5,
                       tmap_max_cells = 1e+06) {
@@ -212,6 +242,13 @@ bayes_plot_map <- function(x,
     )
     # read the file using stars
     stars_obj <- stars::st_as_stars(x)
+
+    if (!purrr::is_null(xmin) &&
+        !purrr::is_null(xmax) &&
+        !purrr::is_null(ymin) &&
+        !purrr::is_null(ymax)) {
+        stars_obj <- stars_obj[,xmin:xmax, ymin:ymax]
+    }
 
     # plot using tmap
     # tmap requires numbers, not names    # rename stars object
@@ -328,7 +365,7 @@ bayes_plot_hist <- function(x,
 #'
 .plot_read_size <- function(image) {
     # get the maximum number of bytes to be displayed
-    max_cells <- 1e+07
+    max_cells <- 6e+07
     # numbers of nrows and ncols
     nrows <- nrow(image)
     ncols <- ncol(image)

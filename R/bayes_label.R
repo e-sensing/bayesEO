@@ -17,16 +17,16 @@
 #'     data_dir <- system.file("/extdata/probs/", package = "bayesEO")
 #'     file <- list.files(data_dir)
 #'     # create a SpatRaster object from the file
-#'     x <- terra::rast(paste0(data_dir, "/", file))
+#'     probs_file <- paste0(data_dir, "/", file)
 #'     # provide the labels
 #'     labels <- c("Water", "ClearCut_Burn", "ClearCut_Soil",
 #'              "ClearCut_Veg", "Forest", "Wetland")
-#'     # name the layers in the SpatRaster with the labels
-#'     names(x) <- labels
+#'     # read the probs file
+#'     probs <- bayes_read_probs(probs_file, labels)
 #'     # produce a labelled map
-#'     y <- bayes_label(x)
+#'     map <- bayes_label(probs)
 #'     # plot the labelled map
-#'     bayes_map(y)
+#'     bayes_plot_map(map)
 #'}
 #'
 #' @export
@@ -70,16 +70,16 @@ bayes_label <- function(x){
 #'     data_dir <- system.file("/extdata/probs/", package = "bayesEO")
 #'     file <- list.files(data_dir)
 #'     # create a SpatRaster object from the file
-#'     x <- terra::rast(paste0(data_dir, "/", file))
+#'     probs_file <- paste0(data_dir, "/", file)
 #'     # provide the labels
 #'     labels <- c("Water", "ClearCut_Burn", "ClearCut_Soil",
 #'              "ClearCut_Veg", "Forest", "Wetland")
-#'     # name the layers in the SpatRaster with the labels
-#'     names(x) <- labels
+#'     # read the probs file
+#'     probs <- bayes_read_probs(probs_file, labels)
 #'     # produce a labelled map
-#'     y <- bayes_label(x)
+#'     map <- bayes_label(probs)
 #'     # plot the labelled map
-#'     bayes_summary(y)
+#'     bayes_summary(map)
 #'}
 #'
 #' @export

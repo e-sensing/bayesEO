@@ -4,7 +4,16 @@
 \alias{bayes_plot_rgb}
 \title{Plot RGB data cubes}
 \usage{
-bayes_plot_rgb(image, red, green, blue)
+bayes_plot_rgb(
+  image,
+  red,
+  green,
+  blue,
+  xmin = NULL,
+  xmax = NULL,
+  ymin = NULL,
+  ymax = NULL
+)
 }
 \arguments{
 \item{image}{Object of class SpatRaster.}
@@ -14,6 +23,14 @@ bayes_plot_rgb(image, red, green, blue)
 \item{green}{Band for green color.}
 
 \item{blue}{Band for blue color.}
+
+\item{xmin}{Subset to be shown (xmin)}
+
+\item{xmax}{Subset to be shown (xmax)}
+
+\item{ymin}{Subset to be shown (ymin)}
+
+\item{ymax}{Subset to be shown (ymax)}
 }
 \value{
 A plot object with an RGB image

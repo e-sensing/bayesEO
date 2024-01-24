@@ -8,9 +8,13 @@ bayes_plot_map(
   x,
   legend = NULL,
   palette = "Spectral",
+  xmin = NULL,
+  xmax = NULL,
+  ymin = NULL,
+  ymax = NULL,
   tmap_graticules_labels_size = 0.7,
-  tmap_legend_title_size = 0.7,
-  tmap_legend_text_size = 0.7,
+  tmap_legend_title_size = 0.85,
+  tmap_legend_text_size = 0.85,
   tmap_legend_bg_color = "white",
   tmap_legend_bg_alpha = 0.5,
   tmap_max_cells = 1e+06
@@ -22,6 +26,14 @@ bayes_plot_map(
 \item{legend}{Named vector that associates labels to colors.}
 
 \item{palette}{A sequential RColorBrewer palette}
+
+\item{xmin}{Subset to be shown (xmin)}
+
+\item{xmax}{Subset to be shown (xmax)}
+
+\item{ymin}{Subset to be shown (ymin)}
+
+\item{ymax}{Subset to be shown (ymax)}
 
 \item{tmap_graticules_labels_size}{Size of graticules labels (default: 0.7)}
 
