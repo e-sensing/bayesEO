@@ -136,13 +136,6 @@ bayes_plot_probs <- function(x,
                         title = all_labels[all_labels %in% labels]) +
         tmap::tm_facets(free.coords = TRUE) +
         tmap::tm_compass() +
-        # tmap::tm_layout(legend.show = TRUE,
-        #                 legend.outside = FALSE,
-        #                 legend.bg.color   = tmap_legend_bg_color,
-        #                 legend.bg.alpha   = tmap_legend_bg_alpha,
-        #                 legend.title.size = tmap_legend_title_size,
-        #                 legend.text.size  =  tmap_legend_text_size,
-        #                 outer.margins = 0)
         tmap::tm_layout(
             scale = tmap_scale,
             legend.show = TRUE,
@@ -211,7 +204,6 @@ bayes_plot_map <- function(x,
         msg = "input is not a categorical map"
     )
     labels <- terra::levels(x)[[1]]$class
-    # names(labels) <- seq_along(labels)
     # obtain the colors
     colors <- .color_get_labels(
         labels = labels,

@@ -1,7 +1,5 @@
 #' @title  Include leaflet to view images (BW or RGB)
 #' @name bayes_view
-#' @keywords internal
-#' @noRd
 #' @author Gilberto Camara, \email{gilberto.camara@@inpe.br}
 #'
 #' @param  image         Image to be plotted
@@ -13,7 +11,7 @@
 #' @param  palette       Palette provided in the configuration file.
 #' @param  opacity       Opacity of overlayed map
 #' @return               A leaflet object.
-#'
+#' @export
 bayes_view <- function(image,
                        map,
                        red,
@@ -54,7 +52,7 @@ bayes_view <- function(image,
             output_size = output_size
         )
     # get overlay groups
-    overlay_groups <- c("RGB image", "map")
+    overlay_groups <- c("RGB image", "classification")
     # add layers control to leafmap
     leaf_map <- leaf_map |>
         leaflet::addLayersControl(
@@ -89,7 +87,7 @@ bayes_view <- function(image,
     leaflet_comp_factor <-  0.50
     # calculate the total size of all input images in bytes
     # note that leaflet considers 4 bytes per pixel
-    in_size_mbytes <- 4 * nrows * ncols * comp
+    in_size_mbytes <- 4 * nrows * ncols * leaflet_comp_factor
     # do we need to compress?
     ratio <- max((in_size_mbytes / (view_max_mb * 1024 * 1024)), 1)
     # only create local files if required
@@ -230,7 +228,7 @@ bayes_view <- function(image,
                       output_size) {
     # should we overlay a classified image?
     # get the labels
-    labels <- names(map)
+    labels <- terra::levels(map)[[1]]$class
     # obtain the colors
     colors <- .color_get_labels(
         labels = labels,
@@ -243,18 +241,7 @@ bayes_view <- function(image,
     # read the file using stars
     st_obj <- stars::st_as_stars(map)
     # rename stars object
-    st_obj <- stats::setNames(st_obj, "labels")
-        # # obtain the raster stars object
-        # st_obj <- stars::read_stars(
-        #     .tile_path(tile),
-        #     RAT = labels,
-        #     RasterIO = list(
-        #         "nBufXSize" = output_size[["xsize"]],
-        #         "nBufYSize" = output_size[["ysize"]]
-        #     ),
-        #     proxy = FALSE
-        # )
-        # return(st_obj)
+    # st_obj <- stats::setNames(st_obj, "labels")
     # resample and warp the image
     st_obj_new <- stars::st_warp(
         src = st_obj,
@@ -291,7 +278,7 @@ bayes_view <- function(image,
                              legend,
                              palette) {
     # initialize labels
-    labels <- names(map)
+    labels <- terra::levels(map)[[1]]$class
 
     # obtain labels
     labels <- sort(unname(labels))
