@@ -2,21 +2,25 @@ test_that("BayesEO", {
 
     data_dir <- system.file("/extdata/probs/", package = "bayesEO")
     file <- list.files(data_dir)
-
-    x <- terra::rast(paste0(data_dir, "/", file))
-    expect_true("SpatRaster" %in% class(x))
-    expect_equal(terra::xmax(x), 350000)
-    expect_true(grepl("SENTINEL-2", terra::sources(x)))
-
+    probs_file <- paste0(data_dir, "/", file)
     labels <- c("Water", "ClearCut_Burn", "ClearCut_Soil",
                 "ClearCut_Veg", "Forest", "Wetland")
 
-    names(x) <- labels
+    x <- bayes_read_probs(probs_file, labels)
     expect_equal(names(x), labels)
+    expect_true("SpatRaster" %in% class(x))
+    expect_equal(terra::xmax(x), 350000)
 
-    p <- bayes_plot(x, scale = 0.0001, labels = c("Forest", "ClearCut_Soil"))
+    rgb_dir <- system.file("/extdata/rgb/", package = "bayesEO")
+    rgb_files <- paste0(rgb_dir, "/", list.files(rgb_dir))
+
+    rgb_image <- bayes_read_image(rgb_files)
+    expect_equal(terra::nlyr(rgb_image), 3)
+    expect_true("SpatRaster" %in% class(rgb_image))
+    expect_equal(terra::xmax(rgb_image), 350000)
+
+    p <- bayes_plot_probs(x, labels = c("Forest", "ClearCut_Soil"))
     expect_true(p$tm_layout$legend.bg.color == "white")
-    expect_true(p$tm_layout$legend.text.size  == 1)
     expect_true(p$tm_shape$line.center == "midpoint")
 
     y <- bayes_smooth(
@@ -30,19 +34,13 @@ test_that("BayesEO", {
     expect_true(max(y[,1]) < 10000)
     expect_true(max(y[,1]) > 9500)
 
-    p1 <- bayes_plot(y, scale = 0.0001, labels = c("Forest", "ClearCut_Soil"))
-    expect_true(p1$tm_layout$legend.bg.color == "white")
-    expect_true(p1$tm_layout$legend.text.size  == 1)
-    expect_true(p1$tm_shape$line.center == "midpoint")
-
     z <- bayes_label(x)
     expect_equal(terra::levels(z)[[1]]$class, labels)
     expect_equal(terra::xmax(z), 350000)
     expect_equal(terra::nlyr(z), 1)
 
-    p2 <- bayes_map(z)
+    p2 <- bayes_plot_map(z)
     expect_true(p2$tm_layout$legend.bg.color == "white")
-    expect_true(p2$tm_layout$legend.text.size  == 1)
     expect_true(p2$tm_shape$line.center == "midpoint")
     expect_equal(p2$tm_raster$labels, labels)
 
@@ -52,14 +50,34 @@ test_that("BayesEO", {
     expect_true(max(v[,1]) < 50)
     expect_true(max(v[,1]) > 0)
 
-    p3 <- bayes_plot(v, quantile = 0.75, labels = c("Forest", "ClearCut_Soil"))
+    p3 <- bayes_plot_probs(v, quantile = 0.75, labels = c("Forest", "ClearCut_Soil"))
     expect_true(p3$tm_layout$legend.bg.color == "white")
-    expect_true(p3$tm_layout$legend.text.size  == 1)
     expect_true(p3$tm_shape$line.center == "midpoint")
     expect_equal(p3$tm_raster$palette, "YlGnBu")
 
-    p4 <- bayes_hist(v, quantile = 0.75)
+    p4 <- bayes_plot_hist(v, quantile = 0.75)
     expect_true(p4$labels$x == "variance")
     expect_true(p4$labels$y == "count")
+
+    yg <- gaussian_smooth(
+        x,
+        window_size = 5
+    )
+    expect_equal(names(yg), labels)
+    expect_equal(terra::xmax(yg), 350000)
+    expect_true(max(yg[,1]) < 10000)
+    expect_true(max(yg[,1]) > 9500)
+
+    yb <- bilateral_smooth(
+        x,
+        window_size = 5
+    )
+    expect_equal(names(yb), labels)
+    expect_equal(terra::xmax(yb), 350000)
+    expect_true(max(yb[,1]) < 10000)
+    expect_true(max(yb[,1]) > 9500)
+
+
+
 
 })

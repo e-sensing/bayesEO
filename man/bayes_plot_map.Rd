@@ -12,9 +12,9 @@ bayes_plot_map(
   xmax = NULL,
   ymin = NULL,
   ymax = NULL,
-  tmap_graticules_labels_size = 0.7,
-  tmap_legend_title_size = 0.85,
-  tmap_legend_text_size = 0.85,
+  tmap_graticules_labels_size = 0.6,
+  tmap_legend_title_size = 0.7,
+  tmap_legend_text_size = 0.7,
   tmap_legend_bg_color = "white",
   tmap_legend_bg_alpha = 0.5,
   tmap_max_cells = 1e+06
@@ -35,17 +35,21 @@ bayes_plot_map(
 
 \item{ymax}{Subset to be shown (ymax)}
 
-\item{tmap_graticules_labels_size}{Size of graticules labels (default: 0.7)}
+\item{tmap_graticules_labels_size}{Size of graticules labels
+(default: 0.7)}
 
 \item{tmap_legend_title_size}{Size of legend title (default: 1.5)}
 
 \item{tmap_legend_text_size}{Size of legend text (default: 1.2)}
 
-\item{tmap_legend_bg_color}{Color of legend backgound (default: "white")}
+\item{tmap_legend_bg_color}{Color of legend backgound
+(default: "white")}
 
-\item{tmap_legend_bg_alpha}{Transparency of legend background (default: 0.5)}
+\item{tmap_legend_bg_alpha}{Transparency of legend background
+(default: 0.5)}
 
-\item{tmap_max_cells}{Maximum number of cells for tmap (default = 1e+06)}
+\item{tmap_max_cells}{Maximum number of cells for tmap
+(default = 1e+06)}
 }
 \value{
 A plot object
@@ -56,14 +60,15 @@ Plot labelled map
 \examples{
 if (bayes_run_examples()) {
     # Define location of a probability file
-    data_dir <- system.file("/extdata/Rondonia-20LLQ/probs", package = "bayesEO")
+    data_dir <- system.file("/extdata/probs",
+                package = "bayesEO")
     # list the file
     file <- list.files(data_dir)
     # build the full path
     probs_file <- paste0(data_dir, "/", file)
     # define labels
     labels <- c("Water", "ClearCut_Burn", "ClearCut_Soil",
-             "ClearCut_Veg", "Forest", "Wetland")
+                "ClearCut_Veg", "Forest", "Wetland")
 
     probs_image <- bayes_read_probs(probs_file, labels)
     # Label the probs image

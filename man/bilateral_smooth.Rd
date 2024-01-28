@@ -14,9 +14,6 @@ bilateral_smooth(x, window_size = 5, sigma = 8, tau = 0.1)
 \item{sigma}{Standard deviation of the spatial Gaussian kernel}
 
 \item{tau}{Standard deviation of the class probs value}
-
-\item{neigh_fraction}{Fraction of neighbors with high probabilities
-to be used in Bayesian inference.}
 }
 \value{
 A SpatRaster object

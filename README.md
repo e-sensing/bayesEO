@@ -16,6 +16,7 @@ outliers or misclassified pixels. For this reason, image post-processing
 techniques are widely used to refine the labelling in a classified image
 in order to enhance its classification accuracy.
 
+
 The `bayesEO` package provides a new method for Bayesian post-processing
 of images produced by machine learning algorithms. The input to the
 package is an image containing the probabilities of that pixel belonging

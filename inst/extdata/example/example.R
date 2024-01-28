@@ -22,3 +22,17 @@ bayes_plot_rgb(rgb_image, red = "B11", green = "B8A", blue = "B02")
 
 bayes_view(rgb_image, label_map_no_smooth,
            red = "B11", green = "B8A", blue = "B02")
+
+LLQ_cube <- sits_cube(
+    source = "MPC",
+    collection = "SENTINEL-2-L2A",
+    bands = c("B02", "B8A", "B11"),
+    data_dir = data_dir
+)
+
+
+LLQ_cube_copy <- sits_cube_copy(
+    LLQ_cube,
+    roi = c(xmin = 340000, xmax = 350000, ymin = 8930240, ymax = 8940240),
+    output_dir = "~/bayesEO/inst/extdata/rgb2/"
+)

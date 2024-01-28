@@ -34,16 +34,10 @@ if (bayes_run_examples()) {
              "ClearCut_Veg", "Forest", "Wetland")
     # name the layers in the SpatRaster with the labels
     names(x) <- labels
-    # smooth the probability image
-    y <- bayes_smooth(x,
-            window_size = 7,
-            neigh_fraction = 0.5,
-            smoothness = 20
-     )
     # calculate the variance
-    v <- bayes_variance(y)
+    v <- bayes_variance(x)
     # plot the variance
-    bayes_plot(v, quantile = 0.75)
+    bayes_plot_var(v, quantile = 0.75)
 }
 }
 \author{

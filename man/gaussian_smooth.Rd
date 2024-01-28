@@ -12,9 +12,6 @@ gaussian_smooth(x, window_size = 5, sigma = 1)
 \item{window_size}{Size of the neighborhood.}
 
 \item{sigma}{Standard deviation of the spatial Gaussian kernel}
-
-\item{neigh_fraction}{Fraction of neighbors with high probabilities
-to be used in Bayesian inference.}
 }
 \value{
 A SpatRaster object

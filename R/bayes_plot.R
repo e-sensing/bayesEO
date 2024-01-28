@@ -15,12 +15,12 @@
 #' @return               A plot object with an RGB image
 #' @examples
 #' if (bayes_run_examples()) {
-#' # Define location of a probability file
-#' data_dir <- system.file("/extdata/rgb", package = "bayesEO")
+#' # Define location of a RGB files
+#' rgb_dir <- system.file("/extdata/rgb", package = "bayesEO")
 #' # list the file
-#' files <- list.files(data_dir)
+#' files <- list.files(rgb_dir)
 #' # build the full path
-#' image_files <- paste0(data_dir, "/", files)
+#' image_files <- paste0(rgb_dir, "/", files)
 #' rgb_image <- bayes_read_image(image_files)
 #' bayes_plot_rgb(rgb_image, red = "B11", green = "B8A", blue = "B03")
 #' }
@@ -56,7 +56,7 @@ bayes_plot_rgb <- function(image,
     if (!purrr::is_null(xmin) &&
         !purrr::is_null(xmax) &&
         !purrr::is_null(ymin) &&
-        !purrr::is_null(ymax)){
+        !purrr::is_null(ymax)) {
 
         rgb_st <- stars::st_rgb(rgb_st[,xmin:xmax, ymin:ymax, 1:3],
                             dimension = "band",
@@ -85,14 +85,14 @@ bayes_plot_rgb <- function(image,
     return(p)
 }
 
-#' @title  Plot probability and variance maps
+#' @title  Plot probability  maps
 #' @name   bayes_plot_probs
 #' @author Gilberto Camara, \email{gilberto.camara@@inpe.br}
 #' @param  x             SpatRaster to be plotted.
 #' @param  scale         Scaling factor to apply to the data
 #' @param  labels        Labels to be plotted
 #' @param  palette       An RColorBrewer palette
-#' @param  tmap_scale    Global scale parameter for map (default: 1.5)
+#' @param  tmap_scale    Global scale parameter for map (default: 1.0)
 #'
 #' @return               A plot object
 #'
@@ -111,7 +111,7 @@ bayes_plot_rgb <- function(image,
 #'     # Plot the probability image
 #'     bayes_plot_probs(probs,
 #'                      scale = 0.0001,
-#'                      tmap_scale = 1.5)
+#'                      tmap_scale = 1.0)
 #' }
 #'
 #' @export
@@ -119,7 +119,7 @@ bayes_plot_probs <- function(x,
                        scale = 0.0001,
                        labels = NULL,
                        palette = "YlGnBu",
-                       tmap_scale = 1.5){
+                       tmap_scale = 1.0){
 
     # check input image
     .check_that(
@@ -169,7 +169,110 @@ bayes_plot_probs <- function(x,
 
     return(p)
 }
+#' @title  Plot variance maps
+#' @name   bayes_plot_var
+#' @author Gilberto Camara, \email{gilberto.camara@@inpe.br}
+#' @param  x             SpatRaster to be plotted.
+#' @param  labels        Labels to be plotted
+#' @param  quantile      Thereshold of values to be plotted
+#' @param  n             Preferred number of classes
+#' @param  style         Method to process the color scale
+#' @param  palette       An RColorBrewer palette
+#' @param  tmap_scale    Global scale parameter for map (default: 1.5)
+#'
+#' @return               A plot object
+#'
+#' @examples
+#' if (bayes_run_examples()) {
+#'     # get the probability file
+#'     data_dir <- system.file("/extdata/probs/", package = "bayesEO")
+#'     file <- list.files(data_dir)
+#'     # build the full path
+#'     probs_file <- paste0(data_dir, "/", file)
+#'     # include the labels
+#'     labels <- c("Water", "ClearCut_Burn", "ClearCut_Soil",
+#'              "ClearCut_Veg", "Forest", "Wetland")
+#'     # associate the labels to the names of the SpatRaster
+#'     probs <- bayes_read_probs(probs_file, labels)
+#'     # calculate the variance
+#'     var <- bayes_variance(probs)
+#'     # Plot the variance image
+#'     bayes_plot_var(var,
+#'         n = 15,
+#'         style = "order",
+#'         quantile = 0.75,
+#'         palette = "YlGn",
+#'         labels = c("Forest", "ClearCut_Veg"))
+#' }
+#'
+#' @export
+bayes_plot_var <- function(x,
+                           labels = NULL,
+                           quantile = 0.75,
+                           n = 15,
+                           style = "equal",
+                           palette = "YlGnBu",
+                           tmap_scale = 1.0){
 
+    # check input image
+    .check_that(
+        "SpatRaster" %in% class(x),
+        msg = "input is not SpatRaster type"
+    )
+    # get all labels to be plotted
+    all_labels <- names(x)
+    names(all_labels) <- seq_len(length(all_labels))
+    # check the labels to be plotted
+    # if NULL, use all labels
+    if (purrr::is_null(labels))
+        labels <- all_labels
+    else
+        .check_that(all(labels  %in% all_labels),
+                    msg = "labels not in image")
+
+    if (!purrr::is_null(quantile)) {
+        # get values
+        values <- terra::values(x)
+        # show only the chosen quantile
+        values <- lapply(
+            colnames(values), function(name) {
+                vls <- values[,name]
+                quant <- stats::quantile(vls, quantile, na.rm = TRUE)
+                vls[vls < quant] <- NA
+                return(vls)
+            })
+        values <- do.call(cbind, values)
+        colnames(values) <- names(x)
+        terra::values(x) <- values
+    }
+    # read the file using stars
+    var_st <- stars::st_as_stars(x)
+    # rename stars object dimensions to labels
+    var_st <- stars::st_set_dimensions(var_st, "band",
+                                       values = all_labels)
+    # select stars bands to be plotted
+    bds <- as.numeric(names(all_labels[all_labels %in% labels]))
+
+    p <- suppressMessages(
+        tmap::tm_shape(var_st[, , , bds],
+                       raster.downsample = FALSE) +
+            tmap::tm_raster(style = style,
+                            n    = n,
+                            palette = palette,
+                            midpoint = 0.5,
+                            title = all_labels[all_labels %in% labels]) +
+            tmap::tm_facets(free.coords = TRUE) +
+            tmap::tm_compass() +
+            tmap::tm_layout(
+                scale = tmap_scale,
+                legend.show = TRUE,
+                legend.outside = FALSE,
+                legend.bg.color = "white",
+                legend.bg.alpha = 0.5
+            )
+    )
+    return(p)
+}
 
 #' @title  Plot labelled map
 #' @name   bayes_plot_map
@@ -181,26 +284,31 @@ bayes_plot_probs <- function(x,
 #' @param  xmax                        Subset to be shown (xmax)
 #' @param  ymin                        Subset to be shown (ymin)
 #' @param  ymax                        Subset to be shown (ymax)
-#' @param  tmap_graticules_labels_size Size of graticules labels (default: 0.7)
+#' @param  tmap_graticules_labels_size Size of graticules labels
+#'                                     (default: 0.7)
 #' @param  tmap_legend_title_size      Size of legend title (default: 1.5)
 #' @param  tmap_legend_text_size       Size of legend text (default: 1.2)
-#' @param  tmap_legend_bg_color        Color of legend backgound (default: "white")
-#' @param  tmap_legend_bg_alpha        Transparency of legend background (default: 0.5)
-#' @param  tmap_max_cells              Maximum number of cells for tmap (default = 1e+06)
+#' @param  tmap_legend_bg_color        Color of legend backgound
+#'                                     (default: "white")
+#' @param  tmap_legend_bg_alpha        Transparency of legend background
+#'                                     (default: 0.5)
+#' @param  tmap_max_cells              Maximum number of cells for tmap
+#'                                     (default = 1e+06)
 #'
 #' @return               A plot object
 #'
 #' @examples
 #' if (bayes_run_examples()) {
 #'     # Define location of a probability file
-#'     data_dir <- system.file("/extdata/Rondonia-20LLQ/probs", package = "bayesEO")
+#'     data_dir <- system.file("/extdata/probs",
+#'                 package = "bayesEO")
 #'     # list the file
 #'     file <- list.files(data_dir)
 #'     # build the full path
 #'     probs_file <- paste0(data_dir, "/", file)
 #'     # define labels
 #'     labels <- c("Water", "ClearCut_Burn", "ClearCut_Soil",
-#'              "ClearCut_Veg", "Forest", "Wetland")
+#'                 "ClearCut_Veg", "Forest", "Wetland")
 #'
 #'     probs_image <- bayes_read_probs(probs_file, labels)
 #'     # Label the probs image
@@ -217,9 +325,9 @@ bayes_plot_map <- function(x,
                       xmax = NULL,
                       ymin = NULL,
                       ymax = NULL,
-                      tmap_graticules_labels_size = 0.7,
-                      tmap_legend_title_size = 0.85,
-                      tmap_legend_text_size = 0.85,
+                      tmap_graticules_labels_size = 0.6,
+                      tmap_legend_title_size = 0.7,
+                      tmap_legend_text_size = 0.7,
                       tmap_legend_bg_color = "white",
                       tmap_legend_bg_alpha = 0.5,
                       tmap_max_cells = 1e+06) {

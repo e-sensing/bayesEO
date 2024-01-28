@@ -59,6 +59,11 @@ bayes_smooth <- function(x,
     if (length(smoothness == 1)) {
         smoothness <- rep(smoothness, length(labels))
     }
+    # deal with named vector for smoothness
+    if (!purrr::is_null(names(smoothness))) {
+        smoothness <- smoothness[labels]
+        smoothness <- unname(smoothness)
+    }
     # read values
     values <- terra::values(x)
     # deduce scale
@@ -101,8 +106,6 @@ bayes_smooth <- function(x,
 #'
 #' @param  x                 SpatRaster object with probabilities images
 #' @param  window_size       Size of the neighborhood.
-#' @param  neigh_fraction    Fraction of neighbors with high probabilities
-#'                           to be used in Bayesian inference.
 #' @param  sigma             Standard deviation of the spatial Gaussian kernel
 #'
 #' @return A SpatRaster object
@@ -180,8 +183,6 @@ gaussian_smooth <- function(x,
 #'
 #' @param  x                 SpatRaster object with probabilities images
 #' @param  window_size       Size of the neighborhood.
-#' @param  neigh_fraction    Fraction of neighbors with high probabilities
-#'                           to be used in Bayesian inference.
 #' @param  sigma             Standard deviation of the spatial Gaussian kernel
 #' @param  tau               Standard deviation of the class probs value
 #'

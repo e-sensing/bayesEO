@@ -40,12 +40,12 @@ Plot RGB raster cube
 }
 \examples{
 if (bayes_run_examples()) {
-# Define location of a probability file
-data_dir <- system.file("/extdata/rgb", package = "bayesEO")
+# Define location of a RGB files
+rgb_dir <- system.file("/extdata/rgb", package = "bayesEO")
 # list the file
-files <- list.files(data_dir)
+files <- list.files(rgb_dir)
 # build the full path
-image_files <- paste0(data_dir, "/", files)
+image_files <- paste0(rgb_dir, "/", files)
 rgb_image <- bayes_read_image(image_files)
 bayes_plot_rgb(rgb_image, red = "B11", green = "B8A", blue = "B03")
 }
