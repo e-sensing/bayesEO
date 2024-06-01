@@ -1,6 +1,6 @@
 Package: bayesEO
 Type: Package
-Version: 0.2.0
+Version: 0.2.1
 Title: Bayesian Smoothing of Remote Sensing Image Classification
 Authors@R: c(person('Gilberto', 'Camara', role = c('aut', 'cre'), email = 'gilberto.camara.inpe@gmail.com'),
              person('Renato', 'Assuncao', role = c('aut'), email = 'assuncaoest@gmail.com'),
@@ -23,8 +23,6 @@ ByteCompile: true
 LazyData: true
 Imports:
     dplyr,
-    leaflet,
-    leafem,
     ggplot2,
     grDevices,
     purrr,
@@ -43,7 +41,7 @@ Suggests:
 LinkingTo:
     Rcpp,
     RcppArmadillo
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Collate: 
     'api_check.R'
     'bayes_colors.R'
@@ -53,6 +51,5 @@ Collate:
     'bayes_smooth.R'
     'bayes_utils.R'
     'bayes_variance.R'
-    'bayes_view.R'
     'RcppExports.R'
     'zzz.R'
