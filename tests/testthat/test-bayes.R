@@ -50,7 +50,7 @@ test_that("BayesEO", {
     expect_true(max(v[,1]) < 50)
     expect_true(max(v[,1]) > 0)
 
-    p3 <- bayes_plot_probs(v, quantile = 0.75, labels = c("Forest", "ClearCut_Soil"))
+    p3 <- bayes_plot_probs(v, labels = c("Forest", "ClearCut_Soil"))
     expect_true(p3$tm_layout$legend.bg.color == "white")
     expect_true(p3$tm_shape$line.center == "midpoint")
     expect_equal(p3$tm_raster$palette, "YlGnBu")

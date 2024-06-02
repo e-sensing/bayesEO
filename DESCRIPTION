@@ -27,7 +27,6 @@ Imports:
     grDevices,
     purrr,
     Rcpp,
-    sf,
     stars,
     stats,
     terra,
